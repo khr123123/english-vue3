@@ -173,7 +173,7 @@ function startNoteFromSelection() {
   toolbar.show = false
 }
 
-function saveNote() {
+async function saveNote() {
   const a = article.value
   if (!a || !notePopover.range) return
   const noteText = notePopover.text.trim()
@@ -181,7 +181,7 @@ function saveNote() {
     notePopover.show = false
     return
   }
-  const note = await addNote(articleId, {
+  const note = await addNote(a.id, {
     quote: notePopover.quote,
     note: noteText,
     color: 'blue',
