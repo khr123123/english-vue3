@@ -1,0 +1,179 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html,
+  body {
+    font-family: 'Space Grotesk', 'Noto Sans SC', sans-serif;
+    background: #fbfbe8;
+    color: #1d1f12;
+  }
+}
+
+@layer components {
+  .mono {
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .paper-shadow {
+    box-shadow: 0 10px 30px rgba(43, 89, 195, 0.06);
+  }
+  .soft-border {
+    border: 1px solid rgba(43, 89, 195, 0.12);
+  }
+  .highlight {
+    background: linear-gradient(transparent 60%, rgba(43, 89, 195, 0.16) 60%);
+  }
+  .reading p {
+    margin-bottom: 1.25rem;
+    line-height: 1.9;
+    font-size: 1.06rem;
+  }
+  .btn {
+    @apply inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition;
+  }
+  .btn-primary {
+    @apply btn bg-blue text-white hover:bg-blue/90;
+  }
+  .btn-ghost {
+    @apply btn soft-border text-sub hover:text-blue hover:border-blue/40 bg-white/60;
+  }
+  .btn-danger {
+    @apply btn bg-red-500/90 text-white hover:bg-red-600;
+  }
+  .tag {
+    @apply inline-flex items-center rounded-full bg-blueSoft text-blue text-xs px-2.5 py-1 font-medium;
+  }
+  .field {
+    @apply w-full bg-white/70 soft-border rounded-xl px-4 py-2.5 text-sm outline-none focus:border-blue/60 focus:ring-2 focus:ring-blue/15 transition;
+  }
+  .field-lg {
+    @apply field text-base py-3;
+  }
+}
+
+/* Article inline decorations controlled by user editing */
+.article-content .hl-yellow {
+  background: linear-gradient(transparent 60%, rgba(250, 204, 21, 0.55) 60%);
+  border-radius: 2px;
+  padding: 0 1px;
+}
+.article-content .hl-blue {
+  background: linear-gradient(transparent 60%, rgba(43, 89, 195, 0.22) 60%);
+  border-radius: 2px;
+  padding: 0 1px;
+}
+.article-content .hl-pink {
+  background: linear-gradient(transparent 60%, rgba(236, 72, 153, 0.3) 60%);
+  border-radius: 2px;
+  padding: 0 1px;
+}
+.article-content .hl-green {
+  background: linear-gradient(transparent 60%, rgba(34, 197, 94, 0.3) 60%);
+  border-radius: 2px;
+  padding: 0 1px;
+}
+.article-content .underline-mark {
+  text-decoration: underline;
+  text-decoration-color: rgba(43, 89, 195, 0.55);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+}
+.article-content b,
+.article-content strong {
+  color: #1d1f12;
+  font-weight: 700;
+}
+.article-content .note-mark {
+  background: linear-gradient(transparent 58%, rgba(43, 89, 195, 0.18) 58%);
+  border-bottom: 1.5px dashed rgba(43, 89, 195, 0.6);
+  cursor: pointer;
+  padding: 0 1px;
+  border-radius: 2px;
+  transition: background-color .15s;
+}
+.article-content .note-mark:hover {
+  background: linear-gradient(transparent 50%, rgba(43, 89, 195, 0.32) 50%);
+}
+.article-content p {
+  margin-bottom: 1.25rem;
+  line-height: 1.9;
+  font-size: 1.06rem;
+}
+.article-content h2 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin: 1.5rem 0 0.75rem;
+}
+.article-content h3 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin: 1.25rem 0 0.5rem;
+}
+.article-content blockquote {
+  border-left: 3px solid rgba(43, 89, 195, 0.5);
+  padding: 0.5rem 1rem;
+  margin: 1rem 0;
+  color: #5a5e4a;
+  background: rgba(43, 89, 195, 0.04);
+  border-radius: 0 12px 12px 0;
+}
+.article-content ul,
+.article-content ol {
+  padding-left: 1.5rem;
+  margin-bottom: 1.25rem;
+}
+.article-content ul {
+  list-style: disc;
+}
+.article-content ol {
+  list-style: decimal;
+}
+
+/* Floating toolbar */
+.float-toolbar {
+  position: absolute;
+  z-index: 60;
+  display: flex;
+  gap: 2px;
+  background: #1d1f12;
+  color: #fff;
+  border-radius: 10px;
+  padding: 4px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+.float-toolbar button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 28px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #e5e5d5;
+  transition: background .15s;
+}
+.float-toolbar button:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+.float-toolbar .sep {
+  width: 1px;
+  height: 18px;
+  background: rgba(255, 255, 255, 0.15);
+  align-self: center;
+  margin: 0 2px;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(43, 89, 195, 0.18);
+  border-radius: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
