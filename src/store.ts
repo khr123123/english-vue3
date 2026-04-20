@@ -1,7 +1,6 @@
-import { reactive, watch } from 'vue'
+import { reactive } from 'vue'
 import type { Article, NoteItem, VocabItem } from './types'
-
-const STORAGE_KEY = 'english-reading:v1'
+import { getArticles, createArticle as dbCreateArticle, updateArticle as dbUpdateArticle, deleteArticle as dbDeleteArticle } from './db'
 
 function uid(): string {
   return Math.random().toString(36).slice(2, 9) + Date.now().toString(36).slice(-4)
@@ -43,40 +42,50 @@ const DEFAULT_ARTICLE: Article = {
 
 interface AppState {
   articles: Article[]
+  loading: boolean
 }
 
-function load(): AppState {
+async function loadFromDB(): Promise<AppState> {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY)
-    if (raw) {
-      const parsed = JSON.parse(raw) as AppState
-      if (parsed && Array.isArray(parsed.articles)) return parsed
+    let articles = await getArticles()
+    
+    // 如果数据库为空，插入默认文章
+    if (articles.length === 0) {
+      console.log('📝 数据库为空，插入默认文章...')
+      const result = await dbCreateArticle(DEFAULT_ARTICLE)
+      if (result) {
+        articles = [result]
+      } else {
+        articles = [DEFAULT_ARTICLE]
+      }
+    }
+    
+    return {
+      articles,
+      loading: false,
     }
   } catch (err) {
-    console.warn('failed to load state', err)
+    console.warn('从数据库加载失败，使用默认数据:', err)
+    return { articles: [DEFAULT_ARTICLE], loading: false }
   }
-  return { articles: [DEFAULT_ARTICLE] }
 }
 
-export const state = reactive<AppState>(load())
+export const state = reactive<AppState>({
+  articles: [DEFAULT_ARTICLE],
+  loading: true,
+})
 
-watch(
-  () => state,
-  (v) => {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(v))
-    } catch (err) {
-      console.warn('failed to save state', err)
-    }
-  },
-  { deep: true }
-)
+// 初始化时从数据库加载
+loadFromDB().then((data) => {
+  state.articles = data.articles
+  state.loading = false
+})
 
 export function getArticle(id: string): Article | undefined {
   return state.articles.find((a) => a.id === id)
 }
 
-export function createArticle(partial?: Partial<Article>): Article {
+export async function createArticle(partial?: Partial<Article>): Promise<Article> {
   const now = Date.now()
   const article: Article = {
     id: uid(),
@@ -91,60 +100,91 @@ export function createArticle(partial?: Partial<Article>): Article {
     createdAt: now,
     updatedAt: now,
   }
+
+  // 保存到数据库
+  const result = await dbCreateArticle(article)
+  if (result) {
+    state.articles.unshift(result)
+    return result
+  }
+
+  // 如果数据库失败，至少保存到state
   state.articles.unshift(article)
   return article
 }
 
-export function deleteArticle(id: string) {
+export async function updateArticle(id: string, partial: Partial<Article>) {
   const idx = state.articles.findIndex((a) => a.id === id)
-  if (idx >= 0) state.articles.splice(idx, 1)
+  if (idx < 0) return
+
+  const article = state.articles[idx]
+  const updated: Article = {
+    ...article,
+    ...partial,
+    updatedAt: Date.now(),
+  }
+
+  // 保存到数据库
+  await dbUpdateArticle(updated)
+
+  // 更新state
+  state.articles[idx] = updated
 }
 
-export function updateArticle(id: string, patch: Partial<Article>) {
-  const a = getArticle(id)
-  if (!a) return
-  Object.assign(a, patch)
-  a.updatedAt = Date.now()
+export async function deleteArticle(id: string) {
+  const idx = state.articles.findIndex((a) => a.id === id)
+  if (idx < 0) return
+
+  // 从数据库删除
+  await dbDeleteArticle(id)
+
+  // 从state删除
+  state.articles.splice(idx, 1)
 }
 
-export function addVocab(articleId: string, v: Omit<VocabItem, 'id'>) {
+export async function addVocab(articleId: string, v: Omit<VocabItem, 'id'>) {
   const a = getArticle(articleId)
   if (!a) return
   a.vocab.push({ id: uid(), ...v })
   a.updatedAt = Date.now()
+  await dbUpdateArticle(a)
 }
 
-export function removeVocab(articleId: string, vocabId: string) {
+export async function removeVocab(articleId: string, vocabId: string) {
   const a = getArticle(articleId)
   if (!a) return
   const i = a.vocab.findIndex((x) => x.id === vocabId)
   if (i >= 0) a.vocab.splice(i, 1)
   a.updatedAt = Date.now()
+  await dbUpdateArticle(a)
 }
 
-export function addNote(articleId: string, n: Omit<NoteItem, 'id' | 'createdAt'>): NoteItem | undefined {
+export async function addNote(articleId: string, n: Omit<NoteItem, 'id' | 'createdAt'>): Promise<NoteItem | undefined> {
   const a = getArticle(articleId)
   if (!a) return
   const note: NoteItem = { id: uid(), createdAt: Date.now(), ...n }
   a.notes.unshift(note)
   a.updatedAt = Date.now()
+  await dbUpdateArticle(a)
   return note
 }
 
-export function removeNote(articleId: string, noteId: string) {
+export async function removeNote(articleId: string, noteId: string) {
   const a = getArticle(articleId)
   if (!a) return
   const i = a.notes.findIndex((x) => x.id === noteId)
   if (i >= 0) a.notes.splice(i, 1)
   a.updatedAt = Date.now()
+  await dbUpdateArticle(a)
 }
 
-export function updateNote(articleId: string, noteId: string, patch: Partial<NoteItem>) {
+export async function updateNote(articleId: string, noteId: string, patch: Partial<NoteItem>) {
   const a = getArticle(articleId)
   if (!a) return
   const n = a.notes.find((x) => x.id === noteId)
   if (n) Object.assign(n, patch)
   a.updatedAt = Date.now()
+  await dbUpdateArticle(a)
 }
 
 export { uid }
