@@ -28,8 +28,8 @@ function snippet(html: string, n = 160) {
   return t.length > n ? t.slice(0, n) + '…' : t
 }
 
-function handleCreate() {
-  const a = createArticle({
+async function handleCreate() {
+  const a = await createArticle({
     title: 'Untitled Article',
     subtitle: 'A new blank article — start editing to add your own content.',
     content: '<p>Start writing your article here…</p>',

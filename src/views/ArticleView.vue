@@ -181,7 +181,7 @@ function saveNote() {
     notePopover.show = false
     return
   }
-  const note = addNote(a.id, {
+  const note = await addNote(articleId, {
     quote: notePopover.quote,
     note: noteText,
     color: 'blue',
@@ -191,7 +191,7 @@ function saveNote() {
   try {
     const wrap = document.createElement('span')
     wrap.className = 'note-mark'
-    wrap.setAttribute('data-note-id', note.id)
+    wrap.setAttribute('data-note-id', note!.id)
     wrap.title = noteText.slice(0, 80)
     wrap.appendChild(notePopover.range.extractContents())
     notePopover.range.insertNode(wrap)
