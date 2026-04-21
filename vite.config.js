@@ -18,6 +18,11 @@ export default defineConfig({
         hmr: {
             clientPort: 443,
         },
+        middlewareMode: false,
+        headers: {
+            'Cross-Origin-Opener-Policy': 'same-origin-allow-popups',
+            'Cross-Origin-Embedder-Policy': 'require-corp',
+        },
     },
     preview: {
         host: '0.0.0.0',
