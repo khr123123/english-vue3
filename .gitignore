@@ -5,5 +5,4 @@ dist-ssr
 *.log
 .vite
 .env
-.env.local
 *.tsbuildinfo
