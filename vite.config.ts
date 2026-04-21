@@ -12,24 +12,13 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
-  server: {
-    host: '0.0.0.0',
-    port: 5173,
-    strictPort: true,
-    allowedHosts: true,
-    hmr: {
-      clientPort: 443,
-    },
-    middlewareMode: false,
-    headers: {
-      'Cross-Origin-Opener-Policy': 'same-origin-allow-popups',
-      'Cross-Origin-Embedder-Policy': 'require-corp',
-    },
-  },
-  preview: {
-    host: '0.0.0.0',
-    port: 4173,
-    strictPort: true,
-    allowedHosts: true,
-  },
+server: {
+  proxy: {
+    '/api': {
+      target: 'https://bfftpobryzwjlbcdbqxr.supabase.co',
+      changeOrigin: true,
+      rewrite: (path) => path.replace(/^\/api/, '')
+    }
+  }
+}
 })
