@@ -15,7 +15,7 @@ import AppHeader from './components/AppHeader.vue'
       <div>
         <div class="text-sm font-semibold">Minimal Reading Layout</div>
         <div class="text-sm text-sub">
-          Annotate, highlight and make notes on your English articles — all stored locally.
+          Annotate, highlight and make notes on your English articles — all stored on the cloud.
         </div>
       </div>
       <div class="text-xs uppercase tracking-[0.2em] text-sub">
